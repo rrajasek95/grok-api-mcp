@@ -2,7 +2,7 @@
 name = "grok-ask"
 version = "0.1.0"
 edition = "2021"
-description = "CLI for xAI Grok API with web search"
+description = "CLI for xAI Grok API with web and X search"
 license = "MIT"
 
 [[bin]]
@@ -16,6 +16,9 @@ serde_json = "1"
 tokio = { version = "1", features = ["full"] }
 anyhow = "1"
 reqwest = { version = "0.12", features = ["json"] }
+
+[dev-dependencies]
+mockito = "1"
 
 [profile.release]
 opt-level = 3

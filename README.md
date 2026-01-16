@@ -1,6 +1,6 @@
 # Grok API MCP
 
-Two independent tools for stateful Grok interactions with web search grounding:
+Two independent tools for stateful Grok interactions with web and X (Twitter) search grounding:
 
 1. **CLI Client (Rust)** - Standalone `grok-ask` binary that calls Grok API directly
 2. **MCP Server (Python)** - FastMCP backend for tool-based integrations (Claude Desktop, etc.)
@@ -8,8 +8,9 @@ Two independent tools for stateful Grok interactions with web search grounding:
 ## Features
 
 - **Web Search Grounding**: Automatic web search for current/factual information
+- **X (Twitter) Search Grounding**: Search X posts with handle, date, and media filters
 - **Stateful Conversations**: Maintain context across multiple queries via `response_id`
-- **Multiple Tools**: Search, ask, think, and chat modes
+- **Multiple Tools**: Search, ask, think, chat, x-search, and x-ask modes
 
 ## Architecture
 
@@ -27,7 +28,7 @@ The CLI and MCP Server are **independent** - use whichever fits your workflow:
 ┌─────────────────────────────────────────────────────────┐
 │  Grok API                                               │
 │  - Models: grok-4-1-fast-non-reasoning / grok-4-1-fast  │
-│  - Automatic grounding (web_search)                     │
+│  - Automatic grounding (web_search, x_search)           │
 │  - Server-side conversation state                       │
 └─────────────────────┬───────────────────────────────────┘
                       ▲
@@ -47,7 +48,7 @@ The CLI and MCP Server are **independent** - use whichever fits your workflow:
 # Set API key
 export XAI_API_KEY=your_key_here
 
-# Quick search
+# Quick web search
 grok-ask --search "latest AI news"
 
 # Get grounded answer
@@ -58,6 +59,17 @@ grok-ask --think "Compare Grok to GPT-4"
 
 # Chat without web search
 grok-ask --chat "Tell me a joke"
+
+# Search X (Twitter) posts
+grok-ask --x-search "AI news"
+
+# Get answers grounded in X posts
+grok-ask --x-ask "What are people saying about Grok?"
+
+# X search with filters
+grok-ask --x-search "AI safety" --allowed-handles elonmusk,sama
+grok-ask --x-search "SpaceX" --from-date 2025-01-01 --to-date 2025-01-15
+grok-ask --x-ask "Latest xAI updates" --enable-images --enable-video
 
 # Follow-up conversation
 grok-ask --ask "What products does xAI offer?" -r <response_id>
@@ -76,7 +88,7 @@ cp .env.example .env
 uv run python server.py
 ```
 
-Then connect via MCP client with tools: `search`, `ask`, `think`, `chat`
+Then connect via MCP client with tools: `search`, `ask`, `think`, `chat`, `x_search`, `x_ask`
 
 ## Installation
 
@@ -107,12 +119,25 @@ Get your Grok API key from: https://console.x.ai/
 
 ## Tools
 
-| Tool | Model | Web Search | Max Tokens |
-|------|-------|------------|------------|
-| `search` | grok-4-1-fast-non-reasoning | Yes | 4096 |
-| `ask` | grok-4-1-fast-non-reasoning | Yes | 8192 |
-| `think` | grok-4-1-fast | Yes | 16384 |
-| `chat` | grok-4-1-fast-non-reasoning | No | 8192 |
+| Tool | Model | Search | Max Tokens |
+|------|-------|--------|------------|
+| `search` | grok-4-1-fast-non-reasoning | Web | 4096 |
+| `ask` | grok-4-1-fast-non-reasoning | Web | 8192 |
+| `think` | grok-4-1-fast | Web | 16384 |
+| `chat` | grok-4-1-fast-non-reasoning | None | 8192 |
+| `x_search` | grok-4-1-fast-non-reasoning | X (Twitter) | 4096 |
+| `x_ask` | grok-4-1-fast-non-reasoning | X (Twitter) | 8192 |
+
+### X Search Filter Options
+
+| Option | Description |
+|--------|-------------|
+| `allowed_handles` | Only include posts from these X handles (max 10) |
+| `excluded_handles` | Exclude posts from these X handles (max 10) |
+| `from_date` | Start date in YYYY-MM-DD format |
+| `to_date` | End date in YYYY-MM-DD format |
+| `enable_images` | Allow model to analyze images in posts |
+| `enable_video` | Allow model to analyze videos in posts |
 
 ## Usage Examples
 
@@ -134,6 +159,31 @@ think("Compare Grok's capabilities to other AI models")
 ### General chat (no web search)
 ```python
 chat("Tell me a joke about programming")
+```
+
+### Search X posts
+```python
+x_search("AI safety discussions")
+```
+
+### Search X with filters
+```python
+# Only from specific handles
+x_search("AI news", allowed_handles=["elonmusk", "sama"])
+
+# Date range
+x_search("SpaceX launch", from_date="2025-01-01", to_date="2025-01-15")
+
+# With media understanding
+x_search("xAI demos", enable_images=True, enable_video=True)
+```
+
+### Get answers from X posts
+```python
+x_ask("What are people saying about Grok?")
+
+# From specific accounts
+x_ask("Latest xAI announcements", allowed_handles=["xai"])
 ```
 
 ### Multi-turn conversation
@@ -192,7 +242,7 @@ grok-api-mcp/
 
 The server uses the Grok API endpoint: `https://api.x.ai/v1/responses`
 
-### Request Format
+### Request Format (Web Search)
 
 ```json
 {
@@ -202,6 +252,27 @@ The server uses the Grok API endpoint: `https://api.x.ai/v1/responses`
   ],
   "tools": [
     {"type": "web_search"}
+  ]
+}
+```
+
+### Request Format (X Search)
+
+```json
+{
+  "model": "grok-4-1-fast-non-reasoning",
+  "input": [
+    {"role": "user", "content": "Your question"}
+  ],
+  "tools": [
+    {
+      "type": "x_search",
+      "allowed_x_handles": ["elonmusk"],
+      "from_date": "2025-01-01",
+      "to_date": "2025-01-15",
+      "enable_image_understanding": true,
+      "enable_video_understanding": true
+    }
   ]
 }
 ```
