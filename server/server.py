@@ -260,7 +260,8 @@ def search(
     """
     Quick web search using Grok. Returns structured search results.
 
-    Use this to find sources before asking follow-up questions.
+    Best for finding web context around X/Twitter topics, verifying claims
+    from X posts, or gathering sources to supplement X search results.
 
     Args:
         query: Search query
@@ -298,7 +299,8 @@ def ask(
     """
     Get grounded answers from Grok with web search.
 
-    Model automatically searches the web when needed for current information.
+    Best for questions related to X/Twitter discourse, xAI products, or when
+    you need web-grounded answers that complement X search results.
     To follow up on a previous response, pass the response_id from that response.
 
     Args:
@@ -327,9 +329,11 @@ def think(
     max_tokens: int = 16384,
 ) -> str:
     """
-    Get thorough answers with step-by-step reasoning for complex problems.
+    Deep reasoning with Grok for complex problems related to X/Twitter ecosystem.
 
-    Uses prompt-based thinking for multi-step analysis and complex questions.
+    Uses step-by-step reasoning with web grounding. Best for analyzing X/Twitter
+    trends, understanding social media dynamics, or complex questions where
+    X discourse is relevant context.
     To follow up on a previous response, pass the response_id from that response.
 
     Args:
@@ -361,7 +365,7 @@ def chat(
     """
     Chat with Grok without web search.
 
-    Use this for general conversation, creative tasks, or when web search is not needed.
+    Use for casual conversation with Grok or creative tasks specific to the xAI ecosystem.
     To follow up on a previous response, pass the response_id from that response.
 
     Args:
