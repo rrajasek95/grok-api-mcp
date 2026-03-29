@@ -23,7 +23,7 @@ struct Cli {
     #[arg(long)]
     ask: Option<String>,
 
-    /// Think query (shorthand for ask-thinking command)
+    /// Think query (shorthand for think command)
     #[arg(long)]
     think: Option<String>,
 

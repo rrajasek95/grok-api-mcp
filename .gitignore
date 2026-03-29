@@ -44,3 +44,4 @@ uv.lock
 
 # Project specific
 *.log
+target/

@@ -1,6 +1,6 @@
 # Grok API Skill
 
-Use the Grok API MCP to search the web and get grounded answers from Grok (xAI).
+Use the Grok API MCP server to search the web and get grounded answers from Grok (xAI). Prefer the Rust CLI in `cli/` for direct terminal use; use the MCP server when an MCP host specifically needs tools.
 
 ## When to Use
 
@@ -23,9 +23,9 @@ ask(query: str, response_id: Optional[str] = None, max_tokens: int = 8192)
 ```
 Returns a concise, factual answer with citations.
 
-### ask_thinking - Deep Reasoning
+### think - Deep Reasoning
 ```
-ask_thinking(query: str, response_id: Optional[str] = None, max_tokens: int = 16384)
+think(query: str, response_id: Optional[str] = None, max_tokens: int = 16384)
 ```
 Returns thorough analysis with step-by-step reasoning.
 
@@ -34,6 +34,37 @@ Returns thorough analysis with step-by-step reasoning.
 chat(query: str, response_id: Optional[str] = None, max_tokens: int = 8192)
 ```
 Chat without web search for creative tasks or general conversation.
+
+### x_search - Search X Posts
+```
+x_search(
+    query: str,
+    max_results: int = 10,
+    allowed_handles: Optional[list[str]] = None,
+    excluded_handles: Optional[list[str]] = None,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    enable_images: bool = False,
+    enable_video: bool = False,
+)
+```
+Returns structured X search results with authors, posts, and URLs.
+
+### x_ask - Grounded Answer From X
+```
+x_ask(
+    query: str,
+    response_id: Optional[str] = None,
+    max_tokens: int = 8192,
+    allowed_handles: Optional[list[str]] = None,
+    excluded_handles: Optional[list[str]] = None,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    enable_images: bool = False,
+    enable_video: bool = False,
+)
+```
+Returns an answer grounded in X posts, with follow-up support via `response_id`.
 
 ## Examples
 
@@ -49,7 +80,17 @@ ask("What is xAI and what is their mission?")
 
 ### Deep analysis
 ```
-ask_thinking("Compare the capabilities and architecture of Grok vs other AI models")
+think("Compare the capabilities and architecture of Grok vs other AI models")
+```
+
+### Search X posts
+```
+x_search("Latest xAI announcements", allowed_handles=["xai"])
+```
+
+### Ask using X posts as sources
+```
+x_ask("What are people saying about Grok?", from_date="2026-03-01")
 ```
 
 ### Multi-turn conversation

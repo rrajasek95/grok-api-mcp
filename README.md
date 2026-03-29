@@ -14,7 +14,9 @@ Two independent tools for stateful Grok interactions with web and X (Twitter) se
 
 ## Architecture
 
-The CLI and MCP Server are **independent** - use whichever fits your workflow:
+Prefer the Rust CLI for direct usage. Reach for the Python MCP server when you specifically need MCP integration in a host like Claude Desktop.
+
+The CLI and MCP server are independent clients for the same Grok Responses API:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -45,6 +47,13 @@ The CLI and MCP Server are **independent** - use whichever fits your workflow:
 ### CLI Usage
 
 ```bash
+# Install the binary first
+cd cli
+cargo install --path .
+
+# Make sure Cargo binaries are on your PATH
+export PATH="$HOME/.cargo/bin:$PATH"
+
 # Set API key
 export XAI_API_KEY=your_key_here
 
@@ -98,6 +107,12 @@ Then connect via MCP client with tools: `search`, `ask`, `think`, `chat`, `x_sea
 # Install globally
 cd cli
 cargo install --path .
+
+# If grok-ask is not found afterwards, add Cargo's bin directory to your shell PATH
+echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.zshrc
+# Reload your shell if you want the new PATH to apply immediately in the current terminal.
+# This is only needed after editing ~/.zshrc; opening a new terminal works too.
+source ~/.zshrc
 
 # Or build locally
 cargo build --release
@@ -213,7 +228,13 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
   "mcpServers": {
     "grok": {
       "command": "uv",
-      "args": ["run", "python", "/path/to/grok-api-mcp/server/server.py"],
+      "args": [
+        "run",
+        "--directory",
+        "/path/to/grok-api-mcp/server",
+        "python",
+        "server.py"
+      ],
       "env": {
         "XAI_API_KEY": "your_api_key_here"
       }
@@ -240,7 +261,7 @@ grok-api-mcp/
 
 ## API Reference
 
-The server uses the Grok API endpoint: `https://api.x.ai/v1/responses`
+Both the CLI and the MCP server use the Grok API endpoint: `https://api.x.ai/v1/responses`
 
 ### Request Format (Web Search)
 
